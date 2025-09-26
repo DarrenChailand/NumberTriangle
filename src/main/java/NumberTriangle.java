@@ -88,9 +88,29 @@ public class NumberTriangle {
      *
      */
     public int retrieve(String path) {
-        // TODO implement this method
-        return -1;
+        // base case: if path is empty, return this node's value
+        if (path.isEmpty()) {
+            return this.root;
+        }
+
+        char c = path.charAt(0);          // look at the first character
+        String rest = path.substring(1);  // the remaining path
+
+        if (c == 'l') {
+            if (left == null) {
+                throw new IllegalStateException("No left child to follow");
+            }
+            return left.retrieve(rest);   // recurse on the left child
+        } else if (c == 'r') {
+            if (right == null) {
+                throw new IllegalStateException("No right child to follow");
+            }
+            return right.retrieve(rest);  // recurse on the right child
+        } else {
+            throw new IllegalArgumentException("Path contains invalid character: " + c);
+        }
     }
+
 
     /** Read in the NumberTriangle structure from a file.
      *
