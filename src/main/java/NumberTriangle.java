@@ -104,27 +104,46 @@ public class NumberTriangle {
      * @throws IOException may naturally occur if an issue reading the file occurs
      */
     public static NumberTriangle loadTriangle(String fname) throws IOException {
-        // open the file and get a BufferedReader object whose methods
-        // are more convenient to work with when reading the file contents.
         InputStream inputStream = NumberTriangle.class.getClassLoader().getResourceAsStream(fname);
+        if (inputStream == null) {
+            throw new IOException("Resource not found: " + fname);
+        }
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
-
-        // TODO define any variables that you want to use to store things
-
-        // will need to return the top of the NumberTriangle,
-        // so might want a variable for that.
         NumberTriangle top = null;
+
+        // Keep track of the previous row so we can link it to the current row.
+        java.util.List<NumberTriangle> prevRow = null;
 
         String line = br.readLine();
         while (line != null) {
+            line = line.trim();
+            if (!line.isEmpty()) {
+                // Parse this row of ints
+                String[] parts = line.split("\\s+");
+                java.util.List<NumberTriangle> currRow = new java.util.ArrayList<>(parts.length);
+                for (String p : parts) {
+                    currRow.add(new NumberTriangle(Integer.parseInt(p)));
+                }
 
-            // remove when done; this line is included so running starter code prints the contents of the file
-            System.out.println(line);
+                // Set the top on the first row
+                if (top == null) {
+                    top = currRow.get(0);
+                }
 
-            // TODO process the line
+                // Link previous row to this row (shared children)
+                if (prevRow != null) {
+                    for (int i = 0; i < prevRow.size(); i++) {
+                        prevRow.get(i).setLeft(currRow.get(i));
+                        prevRow.get(i).setRight(currRow.get(i + 1));
+                    }
+                }
 
-            //read the next line
+                // Move down the triangle
+                prevRow = currRow;
+            }
+
+            // read next line
             line = br.readLine();
         }
         br.close();
